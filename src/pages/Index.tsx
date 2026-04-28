@@ -1,16 +1,37 @@
-// Update this page (the content is just a fallback if you fail to update the page)
+import { useEffect, useState } from "react";
+import Navbar from "@/components/Navbar";
+import HeroSlider from "@/components/HeroSlider";
+import MediaRow from "@/components/MediaRow";
+import { fetchFeatured, fetchRows } from "@/lib/api";
+import type { MediaItem, MediaRow as MediaRowType } from "@/types/content";
 
-// IMPORTANT: Fully REPLACE this with your own code
-const PlaceholderIndex = () => {
-  // PLACEHOLDER: Replace this entire return statement with the user's app.
-  // The inline background color is intentionally not part of the design system.
+export default function Index() {
+  const [featured, setFeatured] = useState<MediaItem[]>([]);
+  const [rows, setRows] = useState<MediaRowType[]>([]);
+
+  useEffect(() => {
+    document.title = "Hotstream — Movies, TV, Sports, Disney+ Originals";
+    Promise.all([fetchFeatured(), fetchRows()]).then(([f, r]) => {
+      setFeatured(f);
+      setRows(r);
+    });
+  }, []);
+
   return (
-    <div className="flex min-h-screen items-center justify-center" style={{ backgroundColor: '#fcfbf8' }}>
-      <img data-lovable-blank-page-placeholder="REMOVE_THIS" src="/placeholder.svg" alt="Your app will live here!" />
+    <div className="min-h-screen bg-background">
+      <Navbar />
+      <main>
+        <h1 className="sr-only">Hotstream — Stream movies, TV shows, live sports and Disney+ Originals</h1>
+        <HeroSlider items={featured} />
+        <div className="relative -mt-16 md:-mt-24 space-y-2 pb-20">
+          {rows.map((row) => (
+            <MediaRow key={row.id} row={row} />
+          ))}
+        </div>
+      </main>
+      <footer className="border-t border-border/60 py-8 text-center text-xs text-muted-foreground">
+        © {new Date().getFullYear()} Hotstream. All streams are demo content.
+      </footer>
     </div>
   );
-};
-
-const Index = PlaceholderIndex;
-
-export default Index;
+}
